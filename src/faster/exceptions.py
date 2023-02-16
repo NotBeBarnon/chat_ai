@@ -6,7 +6,9 @@ from fastapi import Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import ORJSONResponse
 from pydantic import BaseModel, ValidationError as PydanticValidationError
-from tortoise.exceptions import DoesNotExist, IntegrityError, ValidationError as TortoiseValidationError
+from starlette import status
+from tortoise.exceptions import DoesNotExist, IntegrityError, ValidationError as TortoiseValidationError, \
+    ValidationError
 
 from .apps import fast_app
 
@@ -15,6 +17,28 @@ __all__ = ("HTTPError",)
 
 class HTTPError(BaseModel):
     detail: str
+
+class APIValidationError(ValidationError):
+    """自定义http status code"""
+
+    def __init__(self, msg=None, code=None, status_code=status.HTTP_400_BAD_REQUEST):
+        if status_code is not None:
+            self.status_code = status_code
+            self.msg = msg
+
+    def __str__(self) -> str:
+        return self.msg
+
+
+@fast_app.exception_handler(APIValidationError)
+async def http_exception_handler(request: Request, exc: APIValidationError):
+    """
+    业务逻辑中的error
+    """
+    return ORJSONResponse(
+        status_code=exc.status_code,
+        content={"detail": [{"loc": [], "msg": str(exc), "type": "APIValidationError"}]},
+    )
 
 
 @fast_app.exception_handler(DoesNotExist)

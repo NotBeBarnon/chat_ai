@@ -12,6 +12,7 @@ from src.my_tools.fastapi_tools import Action, BaseViewSet
 from . import app_name
 from .pydantics import *
 from ...database.models import ChatRecord, User
+from ...exceptions import APIValidationError
 
 chat_routers = APIRouter(prefix=f"/{app_name}")
 
@@ -29,7 +30,9 @@ class ChatViewSet(BaseViewSet):
         record = await ChatRecord.create(question=body.content, user=user)
         # asyncio.create_task(gtp3.call_completion_create(prompt=body.content))
         print(datetime.datetime.now())
-        answer = await gtp3.call_completion_create(prompt=body.content)
+        code, answer = await gtp3.call_completion_create(prompt=body.content)
+        if code == 401:
+            raise APIValidationError(msg=answer)
         print(datetime.datetime.now())
         record.answer = answer
         await record.save()

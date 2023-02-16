@@ -74,8 +74,10 @@ class ChatGPT:
             }
             async with session.post('https://api.openai.com/v1/completions', headers=headers, json=data) as response:
                 response_json = await response.json()
-                print(response_json["choices"][0]["text"])
-                return response_json["choices"][0]["text"]
+                if response.status == 401:
+                    return response.status, "Incorrect API key provided"
+                # print(response_json["choices"][0]["text"])
+                return response.status, response_json["choices"][0]["text"]
 
     async def ask_question(self, prompt):
         # await self.set_args(max_tokens=4097-len(prompt))
