@@ -15,6 +15,8 @@ import openai
 import orjson
 from httpcore import ReadTimeout
 
+from src.settings import API_KEY
+
 
 class Gpt_3_ModelType(str, Enum):
     """文本模型"""
@@ -34,7 +36,7 @@ class ChatGPT:
 
     def __init__(self):
         # self._client = Client(base_url=base_url)
-        self.api_key = "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"
+        self.api_key = API_KEY
         # self.header = {
         #     "Authorization": f"Bearer {self.api_key}"
         # }

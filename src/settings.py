@@ -165,3 +165,6 @@ HTTP_REQUEST_JSON_HEADER = {
     "Accept": "application/json",
     "Content-Type": "application/json",
 }
+
+
+API_KEY = os.getenv("API_KEY")
