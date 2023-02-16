@@ -18,6 +18,8 @@ from .apps import fast_app
 
 __all__ = ()
 
+from .database.models import User
+
 
 @fast_app.on_event("startup")
 async def startup() -> None:
@@ -49,6 +51,8 @@ async def logger_startup() -> None:
 async def init_orm() -> None:
     await Tortoise.init(config=DATABASE_CONFIG)
     logger.success(f"Tortoise-ORM started: {Tortoise.apps}")
+    if not await User.filter().exists():
+        await User.create(id=1, username="测试", open_id=123, score=100)
 
 
 @fast_app.on_event("shutdown")
