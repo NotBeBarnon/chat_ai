@@ -1,2 +1,2 @@
-# web_chat_ai
+# chat_ai
 python连接openai接口
